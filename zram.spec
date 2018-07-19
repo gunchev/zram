@@ -1,5 +1,5 @@
 Name:      zram
-Version:   0.1
+Version:   0.2
 Release:   1%{?dist}
 Summary:   ZRAM for swap config and services for Fedora
 License:   GPLv2+
@@ -53,5 +53,8 @@ install -pm 0755 %{SOURCE4} %{buildroot}%{_sbindir}
 %{_sbindir}/zramstop
 
 %changelog
+* Thu Jul 19 2018 Peter Robinson <pbrobinson@fedoraproject.org> 0.2-1
+- Service ordering fixes, minor cleanup
+
 * Tue Jul 17 2018 Peter Robinson <pbrobinson@fedoraproject.org> 0.1-1
 - Initial package

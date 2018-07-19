@@ -1,8 +1,7 @@
 #!/bin/bash
-
+#set -x
 # default factor of 1/3 of RAM
 factor=3
-echo "Factor: $factor"
 [ -f /etc/zram.conf ] && source /etc/zram.conf || true
 factor=$FACTOR
 
