@@ -12,7 +12,7 @@ priority=32767
 mem_total=$(free -w |grep "^Mem" |awk '{printf("%d",$2)}')
 zram_size=$((${mem_total} / ${factor} /1024))
 
-# zram in recent kernels is multitreaded so we don't need to balance across CPUs
+# ZRAM in recent kernels is multithreaded so we don't need to balance across CPUs
 modprobe -q zram num_devices=1
 
 # Create ZRAM with first device, lz4 algorithm
