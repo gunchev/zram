@@ -1,3 +1,0 @@
-# zram
-
-The zram package
