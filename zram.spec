@@ -1,6 +1,6 @@
 Name:      zram
-Version:   0.4
-Release:   5%{?dist}
+Version:   0.5
+Release:   0%{?dist}
 Summary:   ZRAM for swap config and services for Fedora
 License:   GPLv2+
 
@@ -15,6 +15,7 @@ BuildArch: noarch
 
 %{?systemd_requires}
 BuildRequires: systemd
+BuildRequires: systemd-rpm-macros
 Requires: util-linux gawk grep
 
 %description
@@ -42,6 +43,13 @@ install -d %{buildroot}%{_sbindir}
 install -pm 0755 %{SOURCE3} %{buildroot}%{_sbindir}
 install -pm 0755 %{SOURCE4} %{buildroot}%{_sbindir}
 
+
+%post
+%systemd_post zram-swap.service
+
+%preun
+%systemd_preun zram-swap.service
+
 %postun
 %systemd_postun zram-swap.service
 
@@ -53,6 +61,9 @@ install -pm 0755 %{SOURCE4} %{buildroot}%{_sbindir}
 %{_sbindir}/zramstop
 
 %changelog
+* Tue Jan 23 2024 Doncho N. Gunchev <dgunchev@gmail.com> - 0.5-0
+- Add the ability to set size explicitly, not just as a factor of all RAM.
+
 * Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.4-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
 
