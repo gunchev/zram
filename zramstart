@@ -1,27 +1,37 @@
 #!/bin/bash
-#set -x
+set -e
+
 # default factor of 1/3 of RAM
 factor=3
 # default priority is maximum priority
 priority=32767
-[ -f /etc/zram.conf ] && source /etc/zram.conf || true
-[ -z "$FACTOR" ] || factor=$FACTOR
-[ -z "$PRIORITY" ] || priority=$PRIORITY
 
-# Calculate ZRAM size
-mem_total=$(free -w |grep "^Mem" |awk '{printf("%d",$2)}')
-zram_size=$((${mem_total} / ${factor} /1024))
+if [ -r /etc/zram.conf ]; then
+    source /etc/zram.conf
+    [ -z "$FACTOR" ] || factor=$FACTOR
+    [ -z "$PRIORITY" ] || priority=$PRIORITY
+fi
+
+if [ -n "$SIZE" ]; then
+    # Use the ZRAM size as provided
+    zram_size="$SIZE"
+else
+    # Calculate ZRAM size
+    mem_total=$(free -w | grep "^Mem" | awk '{printf("%d",$2)}')
+    zram_size=$((mem_total / factor / 1024))
+fi
 
 # ZRAM in recent kernels is multithreaded so we don't need to balance across CPUs
-modprobe -q zram num_devices=1
+modprobe -q zram
 
 # Create ZRAM with first device, lz4 algorithm
-zramdev=$(zramctl --find --algorithm lz4 --size ${zram_size}MB 2>&1)
+zram_dev=$(zramctl --find --algorithm lz4 --size "${zram_size}MiB" 2>&1)
+
 # The above returns the device. Use it below
-mkswap $zramdev
-swapon -p $priority $zramdev
+mkswap -q "$zram_dev"
+swapon -p "$priority" "$zram_dev"
 
 # Investigate this and swapiness
 # echo 0 > /proc/sys/vm/page-cluster
 
-echo -e "\nActivated ZRAM swap device of ${zram_size} MB\n"
+echo "Activated ZRAM swap device ${zram_dev} of ${zram_size} MiB"
